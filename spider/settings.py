@@ -24,10 +24,10 @@ ROBOTSTXT_OBEY = True
 # CONCURRENT_REQUESTS = 32
 
 MYSQL_HOST = '127.0.0.1'
-MYSQL_DBNAME = 'yyy'         #数据库名字，请修改
-MYSQL_USER = 'root'             #数据库账号，请修改
-MYSQL_PASSWD = '123456'         #数据库密码，请修改
-MYSQL_PORT = 3306               #数据库端口，在dbhelper中使用
+MYSQL_DBNAME = 'study_sys'  # 数据库名字，请修改
+MYSQL_USER = 'root'  # 数据库账号，请修改
+MYSQL_PASSWD = '123456'  # 数据库密码，请修改
+MYSQL_PORT = 3306  # 数据库端口，在dbhelper中使用
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -71,7 +71,10 @@ MYSQL_PORT = 3306               #数据库端口，在dbhelper中使用
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'spider.pipelines.SpiderPipeline': 300,
-    'spider.pipelines.TedJsonPipeline': 2
+    # 'spider.pipelines.TedJsonPipeline': 2,
+    "spider.pipelines.TedMysqlPipeline": 3,
+    # 'spider.pipelines.CSVPipeline':4
+    # 'spider.pipelines.MySQLStorePipeline':3
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

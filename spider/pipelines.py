@@ -5,10 +5,23 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import codecs
+import csv
 import json
+import logging.handlers
 
+import MySQLdb
+import MySQLdb.cursors
 from twisted.enterprise import adbapi
 
+
+LOG_FILE = r"error.log"
+handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=1024 * 1024, backupCount=5)
+fmt = '[%(levelname)s] %(asctime)s %(name)s: %(message)s'
+formatter = logging.Formatter(fmt)
+handler.setFormatter(formatter)
+logger = logging.getLogger("daily_chart")
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
 class SpiderPipeline(object):
     def process_item(self, item, spider):
@@ -62,13 +75,34 @@ class TedMysqlPipeline(object):
     # 写入数据库中
     # SQL语句在这里
     def _conditional_insert(self, tx, item):
-        sql = "insert into jsbooks(author,title,url,pubday,comments,likes,rewards,views) values(%s,%s,%s,%s,%s,%s,%s,%s)"
+        sql = "insert into video_media(url,pic_url,title,intro,like_num,comment_num,view_num,source,update_time,duration,tag) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
         params = (
-            item['author'], item['title'], item['url'], item['pubday'], item['comments'], item['likes'],
-            item['rewards'],
-            item['reads'])
+            item['url'], item['pic_url'], item['title'], item['intro'], item['like_num'], item['comment_num'],
+            item['view_num'],
+            item['source'], item["update_time"], item['duration'], item['tag'])
         tx.execute(sql, params)
 
     # 错误处理方法
     def _handle_error(self, failue, item, spider):
-        print("failuer")
+        logger.error(failue)
+
+
+
+class CSVPipeline(object):
+
+    def __init__(self):
+        self.csvwriter = csv.writer(open('items.csv', 'wb'), delimiter=',')
+        # self.csvwriter.writerow(
+        #     ['source', 'view_num', 'intro', 'like_num', 'comment_num', 'update_time', 'tag', 'url', 'pic_url', 'title',
+        #      'duration'])
+
+    def process_item(self, item, ampa):
+        rows = zip(item['source'], item['view_num'], item['intro'], item['comment_num'], item['update_time'],
+                   item['tag'], item['url'], item['pic_url'], item['title'], item['duration'])
+
+        for row in rows:
+            self.csvwriter.writerow(row)
+
+        return item
+
+

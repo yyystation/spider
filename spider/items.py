@@ -29,3 +29,8 @@ class Ted2Item(scrapy.Item):
     tag = scrapy.Field()
     duration = scrapy.Field()
     source = scrapy.Field()
+    view_num=scrapy.Field()
+    comment_num = scrapy.Field()
+    like_num = scrapy.Field()
+    intro=scrapy.Field()
+    update_time=scrapy.Field()

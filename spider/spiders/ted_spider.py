@@ -5,7 +5,7 @@
 @file: ted_spider.py.py
 @time: 2018/5/15 0015 18:32
 """
-
+import datetime
 import scrapy
 from scrapy import Request
 import requests
@@ -58,21 +58,22 @@ class TedSpider2(scrapy.Spider):
         for tag in self.tag_lst:
             url = "https://www.ted.com/talks?sort=newest&topics%5B%5D={}".format(tag["label"])
             url = url.replace(" ", "+")
-            print(url)
-            # url = "https://www.ted.com/talks?sort=newest&topics%5B%5D=AI"
+            # url = "https://www.ted.com/talks?sort=newest&topics%5B%5D=3d+printing"
             yield Request(url, headers=self.headers)
 
     def parse(self, response):
         item = Ted2Item()
         item['source'] = response.xpath('.//title/text()').extract()[0]
+        item["view_num"] = 0
+        item["intro"] = "no intro"
+        item['like_num'] = 0
+        item['comment_num'] = 0
+        item["update_time"] = datetime.datetime.now().__str__()
         item['tag'] = response.xpath(
             './/span[@class="stub__label"]/text()').extract()[0]
         movies = response.xpath('.//div[@class="row row-sm-4up row-lg-6up row-skinny"]/div[@class="col"]')
-        print("*****************************")
-        print(movies)
-        print("*****************************")
         for movie in movies:
-            item['url'] = "https://www.ted.com"+movie.xpath(
+            item['url'] = "https://www.ted.com" + movie.xpath(
                 './/a[@class=" ga-link"]/@href').extract()[0]
             item['pic_url'] = movie.xpath(
                 './/img[@class=" thumb__image"]/@src').extract()[0].split("?")[0]
